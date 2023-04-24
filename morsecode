@@ -1,0 +1,79 @@
+rom tkinter import*
+import tkinter.font as FONT
+import RPi.GPIO as GPIO
+from gpiozero import LED
+import time
+
+#use GPIO pin numbering
+GPIO.setmode(GPIO.BCM)
+
+#GUI definition
+win = Tk()
+win.title("Blink Morse Code")
+myFont = FONT.Font(family = 'Helvetica',size = 14, weight = 'bold')
+
+#LED Pin definition
+led = LED(12)
+
+#Declare input string to be translated
+inputString = StringVar()
+
+#Declare duration for dot as 1 second 
+dotDuration = 1
+
+#Declare duration for dash as 3*doDuration
+dashDuration = dotDuration *3
+
+#list of letters in morse code
+letters = ['.-','-...','-.-.','-..','.','..-.','....','..','.---','-.-','.-..','--','-.','---','.--.','--.-','.-.','...','-','
+..-','...-','.--','-..-','-.--','--..']
+
+def blinkMorseCode(morseCode):
+        for char in morseCode:
+                led.on()
+        if (char == '.'):
+                time.sleep(dotDuration)
+        else:
+                time.sleep(dashDuration)
+                led.off()
+
+        time.sleep(dotDuration)
+        time.sleep(dashDuration)
+
+def translateMorseCode():
+
+        inputString = morseCode.get()
+        print("input")
+
+        i=1
+        for c in inputString:
+                if i>12:
+                        break
+                print(c,end="")
+                if c>= 'A' and c <= 'Z':
+                        blinkMorseCode(letters[ord(c) - ord('A')])
+
+                elif c>='a' and c<='z':
+                        blinkMorseCode(letter[ord(c) - ord('a')])
+
+                elif c == '':
+                        time.sleep(dotDuration * 7)
+
+                i+=1
+def close():
+        GPIO.cleanup()
+        win.destroy()
+
+#GUI Elements
+morseCode = Entry(win, font = myFont, width = 30)
+morseCode.grid(row = 0,column = 1)
+
+morseCodeButton = Button(win, text = 'Morse code', font = myFont, command=translateMorseCode)
+morseCodeButton.grid(row=1,column=2)
+
+exitButton = Button(win,text='exit',font=myFont,command=close)
+exitButton.grid(row=2,column=2)
+
+win.protocol("DELETE_WINDOW",close)
+
+win.mainloop()
